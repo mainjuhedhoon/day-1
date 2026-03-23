@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>COVID Data</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+    }
+
+    input {
+      padding: 5px;
+      margin: 10px;
+    }
+
+    #container {
+      width: 300px;
+      margin: auto;
+      text-align: left;
+    }
+
+    .box {
+      border: 1px solid black;
+      margin: 10px 0;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>COVID State Data</h2>
+
+  <input type="text" id="search" placeholder="Enter state name" oninput="filterData()">
+
+  <div id="container"></div>
+
+  <script>
+    let allStates = [];
+
+    function fetchData() {
+      fetch("https://api.rootnet.in/covid19-in/stats/latest")
+        .then(res => res.json())
+        .then(data => {
+          allStates = data.data.regional;
+          showData(allStates);
+        });
+    }
+
+    fetchData();
+
+    function filterData() {
+      let value = document.getElementById("search").value.toLowerCase();
+
+      let filtered = allStates.filter(el =>
+        el.loc.toLowerCase().includes(value)
+      );
+
+      showData(filtered);
+    }
+
+    function showData(states) {
+      let container = document.getElementById("container");
+      container.innerHTML = "";
+
+      states.forEach(el => {
+        let div = document.createElement("div");
+        div.className = "box";
+
+        div.innerHTML = `
+          <h3>${el.loc}</h3>
+          <p>Confirmed: ${el.totalConfirmed}</p>
+          <p>Recovered: ${el.discharged}</p>
+          <p>Deaths: ${el.deaths}</p>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+  </script>
+
+</body>
+</html>
